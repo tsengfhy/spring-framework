@@ -392,8 +392,11 @@ class ConstructorResolver {
 		Class<?> factoryClass;
 		boolean isStatic;
 
+		// @3.2.2.2.1.确定工厂方法所在位置
 		String factoryBeanName = mbd.getFactoryBeanName();
 		if (factoryBeanName != null) {
+			// @3.2.2.2.1.1.使用工厂实例的工厂方法
+			// <bean id="bean" factory-bean="factoryBean" factory-method="getObject" />
 			if (factoryBeanName.equals(beanName)) {
 				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName,
 						"factory-bean reference points back to the same bean definition");
@@ -407,6 +410,8 @@ class ConstructorResolver {
 			isStatic = false;
 		}
 		else {
+			// @3.2.2.2.1.2.使用类的静态工厂方法
+			// <bean id="bean" class="org.springframework.sample.support.Bean" factory-method="getObject" />
 			// It's a static factory method on the bean class.
 			if (!mbd.hasBeanClass()) {
 				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName,
@@ -417,6 +422,7 @@ class ConstructorResolver {
 			isStatic = true;
 		}
 
+		// @3.2.2.2.2.尝试寻找缓存的工厂方法及参数
 		Method factoryMethodToUse = null;
 		ArgumentsHolder argsHolderToUse = null;
 		Object[] argsToUse = null;
@@ -441,11 +447,13 @@ class ConstructorResolver {
 			}
 		}
 
+		// @3.2.2.2.3.缓存的工厂方法或参数不存在，重新解析
 		if (factoryMethodToUse == null || argsToUse == null) {
 			// Need to determine the factory method...
 			// Try all methods with this name to see if they match the given arguments.
 			factoryClass = ClassUtils.getUserClass(factoryClass);
 
+			// @3.2.2.2.3.1.寻找候选工厂方法
 			List<Method> candidates = null;
 			if (mbd.isFactoryMethodUnique) {
 				if (factoryMethodToUse == null) {
@@ -465,6 +473,7 @@ class ConstructorResolver {
 				}
 			}
 
+			// @3.2.2.2.3.2.工厂方法可唯一确定，加入缓存，生成实例并返回
 			if (candidates.size() == 1 && explicitArgs == null && !mbd.hasConstructorArgumentValues()) {
 				Method uniqueCandidate = candidates.get(0);
 				if (uniqueCandidate.getParameterCount() == 0) {
@@ -507,6 +516,7 @@ class ConstructorResolver {
 
 			Deque<UnsatisfiedDependencyException> causes = null;
 
+			// @3.2.2.2.3.3.从候选工厂方法中根据参数个数及类型匹配出最适合的一个
 			for (Method candidate : candidates) {
 				int parameterCount = candidate.getParameterCount();
 
@@ -573,6 +583,7 @@ class ConstructorResolver {
 				}
 			}
 
+			// @3.2.2.2.3.4.没有匹配到合适的工厂方法，抛出异常
 			if (factoryMethodToUse == null || argsToUse == null) {
 				if (causes != null) {
 					UnsatisfiedDependencyException ex = causes.removeLast();
@@ -623,6 +634,7 @@ class ConstructorResolver {
 			}
 		}
 
+		// @3.2.2.2.3.5.以工厂方法进行实例化
 		bw.setBeanInstance(instantiate(beanName, mbd, factoryBean, factoryMethodToUse, argsToUse));
 		return bw;
 	}
