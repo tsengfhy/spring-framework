@@ -326,6 +326,7 @@ class BeanDefinitionValueResolver {
 					resolvedName = namedBean.getBeanName();
 				}
 				else {
+					// @3.2.2.4.3.3.1.1.1.引用对象实例化
 					resolvedName = String.valueOf(doEvaluate(ref.getBeanName()));
 					bean = this.beanFactory.getBean(resolvedName);
 				}

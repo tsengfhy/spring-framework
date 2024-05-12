@@ -1201,6 +1201,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
 
+		// ***此处利用缓存及无参短路路径逻辑代码重复，明显各种补丁打上来的垃圾代码
+		// @3.2.2.3.尝试利用缓存的构造函数进行实例化
 		// Shortcut when re-creating the same bean...
 		boolean resolved = false;
 		boolean autowireNecessary = false;
@@ -1221,7 +1223,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
+		// @3.2.2.4.筛选构造函数进行实例化
 		// Candidate constructors for autowiring?
+		// @3.2.2.4.1.应用SmartInstantiationAwareBeanPostProcessor.determineCandidateConstructors，尝试获取候选构造函数
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 		if (ctors != null || mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR ||
 				mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args)) {
@@ -1234,6 +1238,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			return autowireConstructor(beanName, mbd, ctors, null);
 		}
 
+		// @3.2.2.5.使用无参构造函数进行实例化（无任何限制条件，默认实例化实现）
 		// No special handling: simply use no-arg constructor.
 		return instantiateBean(beanName, mbd);
 	}

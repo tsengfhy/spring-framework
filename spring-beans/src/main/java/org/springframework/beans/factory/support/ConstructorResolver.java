@@ -125,6 +125,7 @@ class ConstructorResolver {
 		ArgumentsHolder argsHolderToUse = null;
 		Object[] argsToUse = null;
 
+		// @3.2.2.4.2.尝试利用缓存的构造函数及参数
 		if (explicitArgs != null) {
 			argsToUse = explicitArgs;
 		}
@@ -145,7 +146,9 @@ class ConstructorResolver {
 			}
 		}
 
+		// @3.2.2.4.3.缓存的构造函数或参数无法利用，重新解析（显示传参需重新解析）
 		if (constructorToUse == null || argsToUse == null) {
+			// @3.2.2.4.3.1.确定候选的构造函数
 			// Take specified constructors, if any.
 			Constructor<?>[] candidates = chosenCtors;
 			if (candidates == null) {
@@ -161,6 +164,7 @@ class ConstructorResolver {
 				}
 			}
 
+			// @3.2.2.4.3.2.无参构造函数可唯一确定，加入缓存，生成实例并返回
 			if (candidates.length == 1 && explicitArgs == null && !mbd.hasConstructorArgumentValues()) {
 				Constructor<?> uniqueCandidate = candidates[0];
 				if (uniqueCandidate.getParameterCount() == 0) {
@@ -174,6 +178,7 @@ class ConstructorResolver {
 				}
 			}
 
+			// @3.2.2.4.3.3.从候选构造函数中根据参数个数及类型匹配出最适合的一个
 			// Need to resolve the constructor.
 			boolean autowiring = (chosenCtors != null ||
 					mbd.getResolvedAutowireMode() == AutowireCapableBeanFactory.AUTOWIRE_CONSTRUCTOR);
@@ -186,9 +191,11 @@ class ConstructorResolver {
 			else {
 				ConstructorArgumentValues cargs = mbd.getConstructorArgumentValues();
 				resolvedValues = new ConstructorArgumentValues();
+				// @3.2.2.4.3.3.1.解析构造函数参数并autowire
 				minNrOfArgs = resolveConstructorArguments(beanName, mbd, bw, cargs, resolvedValues);
 			}
 
+			// @3.2.2.4.3.3.2.构造函数排序
 			AutowireUtils.sortConstructors(candidates);
 			int minTypeDiffWeight = Integer.MAX_VALUE;
 			Set<Constructor<?>> ambiguousConstructors = null;
@@ -259,6 +266,7 @@ class ConstructorResolver {
 				}
 			}
 
+			// @3.2.2.4.3.4.没有匹配到合适的工厂方法，抛出异常
 			if (constructorToUse == null) {
 				if (causes != null) {
 					UnsatisfiedDependencyException ex = causes.removeLast();
@@ -278,11 +286,13 @@ class ConstructorResolver {
 						ambiguousConstructors);
 			}
 
+			// @3.2.2.4.3.5.缓存解析好的构造函数及参数，以便下次直接从缓存取（@3.2.2.4.2.）
 			if (explicitArgs == null && argsHolderToUse != null) {
 				argsHolderToUse.storeCache(mbd, constructorToUse);
 			}
 		}
 
+		// @3.2.2.4.3.6.以选定构造函数进行实例化
 		Assert.state(argsToUse != null, "Unresolved constructor arguments");
 		bw.setBeanInstance(instantiate(beanName, mbd, constructorToUse, argsToUse));
 		return bw;
@@ -422,7 +432,7 @@ class ConstructorResolver {
 			isStatic = true;
 		}
 
-		// @3.2.2.2.2.尝试寻找缓存的工厂方法及参数
+		// @3.2.2.2.2.尝试利用缓存的工厂方法及参数
 		Method factoryMethodToUse = null;
 		ArgumentsHolder argsHolderToUse = null;
 		Object[] argsToUse = null;
@@ -447,7 +457,7 @@ class ConstructorResolver {
 			}
 		}
 
-		// @3.2.2.2.3.缓存的工厂方法或参数不存在，重新解析
+		// @3.2.2.2.3.缓存的工厂方法或参数无法利用，重新解析（显示传参需重新解析）
 		if (factoryMethodToUse == null || argsToUse == null) {
 			// Need to determine the factory method...
 			// Try all methods with this name to see if they match the given arguments.
@@ -473,7 +483,7 @@ class ConstructorResolver {
 				}
 			}
 
-			// @3.2.2.2.3.2.工厂方法可唯一确定，加入缓存，生成实例并返回
+			// @3.2.2.2.3.2.无参工厂方法可唯一确定，加入缓存，生成实例并返回
 			if (candidates.size() == 1 && explicitArgs == null && !mbd.hasConstructorArgumentValues()) {
 				Method uniqueCandidate = candidates.get(0);
 				if (uniqueCandidate.getParameterCount() == 0) {
@@ -488,6 +498,7 @@ class ConstructorResolver {
 				}
 			}
 
+			// @3.2.2.2.3.3.从候选工厂方法中根据参数个数及类型匹配出最适合的一个
 			if (candidates.size() > 1) {  // explicitly skip immutable singletonList
 				candidates.sort(AutowireUtils.EXECUTABLE_COMPARATOR);
 			}
@@ -516,7 +527,6 @@ class ConstructorResolver {
 
 			Deque<UnsatisfiedDependencyException> causes = null;
 
-			// @3.2.2.2.3.3.从候选工厂方法中根据参数个数及类型匹配出最适合的一个
 			for (Method candidate : candidates) {
 				int parameterCount = candidate.getParameterCount();
 
@@ -628,13 +638,14 @@ class ConstructorResolver {
 						ambiguousFactoryMethods);
 			}
 
+			// @3.2.2.2.3.5.缓存解析好的工厂方法函数及参数，以便下次直接从缓存取（@3.2.2.2.2.）
 			if (explicitArgs == null && argsHolderToUse != null) {
 				mbd.factoryMethodToIntrospect = factoryMethodToUse;
 				argsHolderToUse.storeCache(mbd, factoryMethodToUse);
 			}
 		}
 
-		// @3.2.2.2.3.5.以工厂方法进行实例化
+		// @3.2.2.2.3.6.以选定工厂方法进行实例化
 		bw.setBeanInstance(instantiate(beanName, mbd, factoryBean, factoryMethodToUse, argsToUse));
 		return bw;
 	}
@@ -675,6 +686,7 @@ class ConstructorResolver {
 
 		int minNrOfArgs = cargs.getArgumentCount();
 
+		// @3.2.2.4.3.3.1.1.解析带序号构造函数参数
 		for (Map.Entry<Integer, ConstructorArgumentValues.ValueHolder> entry : cargs.getIndexedArgumentValues().entrySet()) {
 			int index = entry.getKey();
 			if (index < 0) {
@@ -689,6 +701,7 @@ class ConstructorResolver {
 				resolvedValues.addIndexedArgumentValue(index, valueHolder);
 			}
 			else {
+				// @3.2.2.4.3.3.1.1.1.解析参数值，如果是对象引用，将实例化对象并返回
 				Object resolvedValue =
 						valueResolver.resolveValueIfNecessary("constructor argument", valueHolder.getValue());
 				ConstructorArgumentValues.ValueHolder resolvedValueHolder =
@@ -698,6 +711,7 @@ class ConstructorResolver {
 			}
 		}
 
+		// @3.2.2.4.3.3.1.2.解析无序号构造函数参数
 		for (ConstructorArgumentValues.ValueHolder valueHolder : cargs.getGenericArgumentValues()) {
 			if (valueHolder.isConverted()) {
 				resolvedValues.addGenericArgumentValue(valueHolder);
