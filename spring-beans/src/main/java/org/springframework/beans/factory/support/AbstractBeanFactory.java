@@ -269,7 +269,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					logger.trace("Returning cached instance of singleton bean '" + beanName + "'");
 				}
 			}
-			// @1.2.根据name决定返回FactoryBean，还是获取真实Bean
+			// @1.4.根据name决定返回FactoryBean，还是获取真实Bean，详见@3.8.
 			beanInstance = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
 
@@ -339,7 +339,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				// @3.createBean
 				// Create bean instance.
 				if (mbd.isSingleton()) {
-					// @3.4.创建成功后放入缓存
+					// @3.7.创建成功后放入缓存
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
 							return createBean(beanName, mbd, args);
@@ -352,7 +352,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							throw ex;
 						}
 					});
-					// @3.5.根据name决定返回FactoryBean，还是获取真实Bean，详见@1.2.
+					// @3.8.根据name决定返回FactoryBean，还是获取真实Bean
 					beanInstance = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
 				}
 
@@ -1878,7 +1878,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected Object getObjectForBeanInstance(
 			Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
 
-		// @1.2.1.获取FactoryBean前校验
+		// @3.8.1.获取FactoryBean前校验
 		// Don't let calling code try to dereference the factory if the bean isn't a factory.
 		if (BeanFactoryUtils.isFactoryDereference(name)) {
 			if (beanInstance instanceof NullBean) {
@@ -1893,7 +1893,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			return beanInstance;
 		}
 
-		// @1.2.2.获取真实Bean，且实例不是FactoryBean，直接返回
+		// @3.8.2.获取真实Bean，且实例不是FactoryBean，直接返回
 		// Now we have the bean instance, which may be a normal bean or a FactoryBean.
 		// If it's a FactoryBean, we use it to create a bean instance, unless the
 		// caller actually wants a reference to the factory.
@@ -1901,7 +1901,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			return beanInstance;
 		}
 
-		// @1.2.3.单例的FactoryBean通过缓存获取最终Bean，如果不存在则生成最终Bean
+		// @3.8.3.单例的FactoryBean通过缓存获取最终Bean，如果不存在则生成最终Bean
 		Object object = null;
 		if (mbd != null) {
 			mbd.isFactoryBean = true;

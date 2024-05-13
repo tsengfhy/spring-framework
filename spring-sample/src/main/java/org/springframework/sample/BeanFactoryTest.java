@@ -12,6 +12,6 @@ public class BeanFactoryTest {
 		reader.loadBeanDefinitions(new ClassPathResource("beans.xml"));
 
 		Bean bean = beanFactory.getBean("bean", Bean.class);
-		System.out.println(bean.getValue());
+		System.out.println(bean.getBean().getValue());
 	}
 }
