@@ -2,13 +2,13 @@ package org.springframework.sample;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.sample.support.Bean;
+import org.springframework.sample.support.BeanInterface;
 
-public class ApplicationContextTest {
+public class ApplicationContextSample {
 	public static void main(String[] args) {
 		ApplicationContext cxt = new ClassPathXmlApplicationContext("beans.xml");
 
-		Bean bean = cxt.getBean("bean", Bean.class);
-		System.out.println(bean.getValue());
+		BeanInterface bean = cxt.getBean("bean", BeanInterface.class);
+		bean.execute();
 	}
 }

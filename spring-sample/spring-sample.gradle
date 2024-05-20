@@ -1,4 +1,5 @@
 dependencies {
-    api(project(":spring-core"))
+    api(project(":spring-beans"))
     api(project(":spring-context"))
+    api(project(":spring-aspects"))
 }

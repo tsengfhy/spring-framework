@@ -637,15 +637,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
-		// @3.5.在循环依赖的情况下，如果不允许提前注入被包装过bean，则抛出异常
+		// @3.5.在循环依赖的情况下，提前暴露的实例会因AOP而产生代理，若初始化阶段也包装Bean，会产生冲突
 		if (earlySingletonExposure) {
 			Object earlySingletonReference = getSingleton(beanName, false);
 			// @3.5.1.不为空代表存在循环依赖，该Bean被提前获取过
 			if (earlySingletonReference != null) {
+				// @3.5.2.若相等表示该Bean没有在初始化前后被包装过，此时可直接使用提前暴露过的因为AOP而通过SmartInstantiationAwareBeanPostProcessor.getEarlyBeanReference产生的代理
 				if (exposedObject == bean) {
 					exposedObject = earlySingletonReference;
 				}
-				// @3.5.2.不相等表示被在提前暴露的Bean被SmartInstantiationAwareBeanPostProcessor.getEarlyBeanReference包装过
 				else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
 					String[] dependentBeans = getDependentBeans(beanName);
 					Set<String> actualDependentBeans = new LinkedHashSet<>(dependentBeans.length);

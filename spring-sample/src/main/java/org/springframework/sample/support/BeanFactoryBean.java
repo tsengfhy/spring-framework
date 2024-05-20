@@ -8,8 +8,7 @@ public class BeanFactoryBean implements FactoryBean<Bean> {
 
 	@Override
 	public Bean getObject() throws Exception {
-		Bean bean = new Bean();
-		bean.setValue(value);
+		Bean bean = new Bean(value);
 		return bean;
 	}
 

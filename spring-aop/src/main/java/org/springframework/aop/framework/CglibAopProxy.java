@@ -287,6 +287,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 		boolean exposeProxy = this.advised.isExposeProxy();
 		boolean isStatic = this.advised.getTargetSource().isStatic();
 
+		// AOP.2.3.3.1.Cglib的代理方法拦截器
 		// Choose an "aop" interceptor (used for AOP calls).
 		Callback aopInterceptor = new DynamicAdvisedInterceptor(this.advised);
 
@@ -690,6 +691,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 				// Get as late as possible to minimize the time we "own" the target, in case it comes from a pool...
 				target = targetSource.getTarget();
 				Class<?> targetClass = (target != null ? target.getClass() : null);
+				// AOP.2.3.3.2.根据Pointcut获取所有可用的Advice
 				List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
 				Object retVal;
 				// Check whether we only have one InvokerInterceptor: that is,

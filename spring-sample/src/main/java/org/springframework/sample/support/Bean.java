@@ -1,25 +1,19 @@
 package org.springframework.sample.support;
 
-public class Bean {
+public class Bean implements BeanInterface {
 
 	// Constructor Value
-	private String value;
+	private final String value;
 	// Autowired Value
 	private Bean bean;
-
-	public Bean() {
-	}
 
 	public Bean(String value) {
 		this.value = value;
 	}
 
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
+	@Override
+	public void execute() {
+		System.out.println(value);
 	}
 
 	public Bean getBean() {
