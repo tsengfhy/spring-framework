@@ -16,6 +16,10 @@ public class Bean implements BeanInterface {
 		System.out.println(value);
 	}
 
+	public String getValue() {
+		return value;
+	}
+
 	public Bean getBean() {
 		return bean;
 	}

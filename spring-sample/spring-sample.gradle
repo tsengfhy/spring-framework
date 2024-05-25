@@ -1,5 +1,11 @@
 dependencies {
+    // BeanFactory
     api(project(":spring-beans"))
+    // ApplicationContext
     api(project(":spring-context"))
+    // AOP
     api(project(":spring-aspects"))
+    // TX
+    api(project(":spring-jdbc"))
+    optional("com.h2database:h2")
 }
