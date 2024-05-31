@@ -8,4 +8,8 @@ dependencies {
     // TX
     api(project(":spring-jdbc"))
     optional("com.h2database:h2")
+    // Web
+    api(project(":spring-webmvc"))
+    optional("javax.servlet:javax.servlet-api")
+    optional("com.fasterxml.jackson.core:jackson-databind")
 }

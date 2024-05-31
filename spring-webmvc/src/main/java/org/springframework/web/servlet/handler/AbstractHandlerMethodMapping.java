@@ -401,9 +401,11 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
 		List<Match> matches = new ArrayList<>();
 		List<T> directPathMatches = this.mappingRegistry.getMappingsByDirectPath(lookupPath);
+		// Web.4.1.1.path直等获取Handler
 		if (directPathMatches != null) {
 			addMatchingMappings(directPathMatches, matches, request);
 		}
+		// Web.4.1.2.遍历所有Handler，获取匹配的
 		if (matches.isEmpty()) {
 			addMatchingMappings(this.mappingRegistry.getRegistrations().keySet(), matches, request);
 		}

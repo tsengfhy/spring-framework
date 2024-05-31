@@ -395,6 +395,7 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 	protected ModelAndView doResolveHandlerMethodException(HttpServletRequest request,
 			HttpServletResponse response, @Nullable HandlerMethod handlerMethod, Exception exception) {
 
+		// Web.7.1.支持@ExceptionHandler
 		ServletInvocableHandlerMethod exceptionHandlerMethod = getExceptionHandlerMethod(handlerMethod, exception);
 		if (exceptionHandlerMethod == null) {
 			return null;

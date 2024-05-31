@@ -148,6 +148,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	@Override
 	public final void init() throws ServletException {
 
+		// Web.0.1.利用Spring的BeanWrapper将ServletConfig中的配置填充到FrameworkServlet中
 		// Set bean properties from init parameters.
 		PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);
 		if (!pvs.isEmpty()) {

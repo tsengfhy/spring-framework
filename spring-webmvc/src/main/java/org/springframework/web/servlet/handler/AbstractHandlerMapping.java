@@ -496,6 +496,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	@Override
 	@Nullable
 	public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
+		// Web.4.1.获取Handler
 		Object handler = getHandlerInternal(request);
 		if (handler == null) {
 			handler = getDefaultHandler();
@@ -514,6 +515,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			initLookupPath(request);
 		}
 
+		// Web.4.2.获取匹配的HandlerInterceptor，并封装成HandlerExecutionChain
 		HandlerExecutionChain executionChain = getHandlerExecutionChain(handler, request);
 
 		if (logger.isTraceEnabled()) {
@@ -523,6 +525,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			logger.debug("Mapped to " + executionChain.getHandler());
 		}
 
+		// Web.4.3.CORS处理，若配置在拦截器首位插入CorsInterceptor，若预检请求，不会调用真实逻辑方法
 		if (hasCorsConfigurationSource(handler) || CorsUtils.isPreFlightRequest(request)) {
 			CorsConfiguration config = getCorsConfiguration(handler, request);
 			if (getCorsConfigurationSource() != null) {

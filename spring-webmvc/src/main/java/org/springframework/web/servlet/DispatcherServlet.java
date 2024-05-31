@@ -488,6 +488,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	@Override
 	protected void onRefresh(ApplicationContext context) {
+		// Web.0.3.利用ContextRefreshListener在ApplicationContext初始化完成时反向填充DispatcherServlet所使用的各类Bean
 		initStrategies(context);
 	}
 
@@ -926,6 +927,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	protected void doService(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logRequest(request);
 
+		// Web.2.对于include request，在进入处理之前保存以DEFAULT_STRATEGIES_PREFIX开头的系统属性快照，并在完成之后恢复
 		// Keep a snapshot of the request attributes in case of an include,
 		// to be able to restore the original attributes after the include.
 		Map<String, Object> attributesSnapshot = null;
@@ -1041,9 +1043,14 @@ public class DispatcherServlet extends FrameworkServlet {
 			Exception dispatchException = null;
 
 			try {
+				// Web.3.MultipartResolver.解析Multipart
+				// StandardServletMultipartResolver: Spring 默认实现，可能暴露Servlet容器差异，严格模式将适用范围缩小到 form data
+				// CommonsMultipartResolver: 基于 commons-fileupload，提供跨Servlet容器移植性
 				processedRequest = checkMultipart(request);
 				multipartRequestParsed = (processedRequest != request);
 
+				// Web.4.HandlerMapping.获取HandlerExecutionChain，其中封装着Handler及HandlerInterceptor
+				// RequestMappingHandlerMapping：解析有@Controller及@RequestMapping的Bean作为Handler
 				// Determine handler for the current request.
 				mappedHandler = getHandler(processedRequest);
 				if (mappedHandler == null) {
@@ -1051,6 +1058,8 @@ public class DispatcherServlet extends FrameworkServlet {
 					return;
 				}
 
+				// Web.5.HandlerAdapter.由于Handler是不同类型的Bean，使用适配器模式做调用适配
+				// RequestMappingHandlerAdapter：适配RequestMappingHandlerMapping
 				// Determine handler adapter for the current request.
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
@@ -1064,10 +1073,12 @@ public class DispatcherServlet extends FrameworkServlet {
 					}
 				}
 
+				// Web.6.1.执行逻辑方法前调用HandlerInterceptor.preHandle
 				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
 					return;
 				}
 
+				// Web.6.2.逻辑方法调用
 				// Actually invoke the handler.
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
@@ -1075,7 +1086,9 @@ public class DispatcherServlet extends FrameworkServlet {
 					return;
 				}
 
+				// Web.6.3.利用RequestToViewNameTranslator为View添加前后缀
 				applyDefaultViewName(processedRequest, mv);
+				// Web.6.4.执行逻辑方法后调用HandlerInterceptor.postHandle
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
 			catch (Exception ex) {
@@ -1133,6 +1146,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 		boolean errorView = false;
 
+		// Web.7.HandlerExceptionResolver.异常处理，返回ModelAndView或者由HandlerMethodReturnValueHandler支持，见Web.6.2.2.
 		if (exception != null) {
 			if (exception instanceof ModelAndViewDefiningException) {
 				logger.debug("ModelAndViewDefiningException encountered", exception);
@@ -1163,6 +1177,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			return;
 		}
 
+		// Web.9.最后调用HandlerInterceptor.afterCompletion
 		if (mappedHandler != null) {
 			// Exception (if any) is already handled..
 			mappedHandler.triggerAfterCompletion(request, response, null);
@@ -1377,6 +1392,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 		View view;
 		String viewName = mv.getViewName();
+		// Web.8.ViewResolver.根据viewName解析View
 		if (viewName != null) {
 			// We need to resolve the view name.
 			view = resolveViewName(viewName, mv.getModelInternal(), locale, request);

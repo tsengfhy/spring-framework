@@ -131,6 +131,7 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 
 		mavContainer.setRequestHandled(false);
 		Assert.state(this.returnValueHandlers != null, "No return value handlers");
+		// Web.6.2.2.HandlerMethodReturnValueHandler.出参解析，其中@ResponseBody由RequestResponseBodyMethodProcessor利用HttpMessageConverter实现。若返回JSON则是MappingJackson2HttpMessageConverter
 		try {
 			this.returnValueHandlers.handleReturnValue(
 					returnValue, getReturnValueType(returnValue), mavContainer, webRequest);

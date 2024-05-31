@@ -905,6 +905,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 				return null;
 			}
 
+			// Web.6.2.3.解析ModelAndView，若不需要（如JSON）则返回null
 			return getModelAndView(mavContainer, modelFactory, webRequest);
 		}
 		finally {

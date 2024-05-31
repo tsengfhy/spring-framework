@@ -71,6 +71,7 @@ public class ResponseStatusExceptionResolver extends AbstractHandlerExceptionRes
 	protected ModelAndView doResolveException(
 			HttpServletRequest request, HttpServletResponse response, @Nullable Object handler, Exception ex) {
 
+		// Web.7.2.支持ResponseStatusException及Exception上@ResponseStatus
 		try {
 			if (ex instanceof ResponseStatusException) {
 				return resolveResponseStatusException((ResponseStatusException) ex, request, response, handler);
