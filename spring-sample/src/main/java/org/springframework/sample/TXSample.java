@@ -1,18 +1,18 @@
 package org.springframework.sample;
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.sample.support.Bean;
-import org.springframework.sample.support.BeanService;
+import org.springframework.sample.support.SampleService;
 
 public class TXSample {
 	public static void main(String[] args) {
-		ApplicationContext cxt = new ClassPathXmlApplicationContext("tx.xml");
+		ApplicationContext cxt = new GenericXmlApplicationContext("tx.xml");
 
-		BeanService beanService = cxt.getBean("beanService", BeanService.class);
+		SampleService sampleService = cxt.getBean("sampleService", SampleService.class);
 		String id = "test";
 		Bean bean = new Bean(id);
-		beanService.save(bean);
-		beanService.get(id).execute();
+		sampleService.save(bean);
+		sampleService.get(id).execute();
 	}
 }

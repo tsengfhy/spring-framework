@@ -6,8 +6,8 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@RequestMapping("/bean")
-public class BeanController {
+@RequestMapping("/sample")
+public class SampleController {
 
 	@GetMapping(path = "/{value}")
 	public Bean get(@PathVariable("value") String value) {

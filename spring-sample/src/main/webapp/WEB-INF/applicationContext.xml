@@ -22,9 +22,9 @@
 	<mvc:interceptors>
 		<mvc:interceptor>
 			<mvc:mapping path="/bean/**"/>
-			<bean class="org.springframework.sample.support.BeanInterceptor" />
+			<bean class="org.springframework.sample.support.SampleInterceptor" />
 		</mvc:interceptor>
 	</mvc:interceptors>
 
-	<bean id="beanController" class="org.springframework.sample.support.BeanController" />
+	<bean id="sampleController" class="org.springframework.sample.support.SampleController" />
 </beans>

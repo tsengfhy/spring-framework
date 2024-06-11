@@ -28,7 +28,7 @@
 		<constructor-arg name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="beanService" class="org.springframework.sample.support.BeanService">
+	<bean id="sampleService" class="org.springframework.sample.support.SampleService">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
 </beans>

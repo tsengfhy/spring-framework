@@ -3,7 +3,7 @@ package org.springframework.sample.support;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
-public class BeanService {
+public class SampleService {
 
 	private JdbcTemplate jdbcTemplate;
 
