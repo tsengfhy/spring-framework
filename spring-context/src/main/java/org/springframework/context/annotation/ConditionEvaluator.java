@@ -90,6 +90,7 @@ class ConditionEvaluator {
 			return shouldSkip(metadata, ConfigurationPhase.REGISTER_BEAN);
 		}
 
+		// Annotation.1.1.1.根据Condition类生成对象
 		List<Condition> conditions = new ArrayList<>();
 		for (String[] conditionClasses : getConditionClasses(metadata)) {
 			for (String conditionClass : conditionClasses) {
@@ -98,8 +99,10 @@ class ConditionEvaluator {
 			}
 		}
 
+		// Annotation.1.1.2.Condition排序，支持@Order
 		AnnotationAwareOrderComparator.sort(conditions);
 
+		// Annotation.1.1.3.依次判断匹配结果
 		for (Condition condition : conditions) {
 			ConfigurationPhase requiredPhase = null;
 			if (condition instanceof ConfigurationCondition) {

@@ -66,6 +66,12 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 */
 	public AnnotationConfigApplicationContext() {
 		StartupStep createAnnotatedBeanDefReader = getApplicationStartup().start("spring.context.annotated-bean-reader.create");
+		// Annotation.0.创建的同时会向自身及BeanFactory注入一系列扩展对象来处理注解
+		// ConditionEvaluator：处理@Conditional，若不满足则不会注入，支持@Order
+		// AnnotationAwareOrderComparator：支持@Order排序
+		// ContextAnnotationAutowireCandidateResolver：处理标有@Lazy的@Autowired，生成代理
+		// ConfigurationClassPostProcessor：处理标有@Configuration的BeanDefinition
+		// AutowiredAnnotationBeanPostProcessor：处理@Autowired和@Value
 		this.reader = new AnnotatedBeanDefinitionReader(this);
 		createAnnotatedBeanDefReader.end();
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
@@ -165,6 +171,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 		Assert.notEmpty(componentClasses, "At least one component class must be specified");
 		StartupStep registerComponentClass = getApplicationStartup().start("spring.context.component-classes.register")
 				.tag("classes", () -> Arrays.toString(componentClasses));
+		// Annotation.1.基于注解的ApplicationContext启动入口，注册componentClass，亦是Spring Boot的启动入口
 		this.reader.register(componentClasses);
 		registerComponentClass.end();
 	}

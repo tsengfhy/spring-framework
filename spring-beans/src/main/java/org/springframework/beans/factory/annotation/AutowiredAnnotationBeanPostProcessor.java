@@ -252,6 +252,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 	@Override
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
+		// Annotation.3.3.解析属性和方法上的@Autowired和@Value
 		InjectionMetadata metadata = findAutowiringMetadata(beanName, beanType, null);
 		metadata.checkConfigMembers(beanDefinition);
 	}
@@ -267,6 +268,8 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	public Constructor<?>[] determineCandidateConstructors(Class<?> beanClass, final String beanName)
 			throws BeanCreationException {
 
+		// Annotation.3.应用SmartInstantiationAwareBeanPostProcessor.determineCandidateConstructors和MergedBeanDefinitionPostProcessor.postProcessMergedBeanDefinition时，处理@Autiwired
+		// Annotation.3.1.解析@Lookup，填入BeanDefinition，后续会在实例化时创建Cglib代理对象，见@3.2.2.5.
 		// Let's check for lookup methods here...
 		if (!this.lookupMethodsChecked.contains(beanName)) {
 			if (AnnotationUtils.isCandidateClass(beanClass, Lookup.class)) {
@@ -301,6 +304,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 			this.lookupMethodsChecked.add(beanName);
 		}
 
+		// Annotation.3.2.解析构造函数上的@Autiwired，并确定构造函数
 		// Quick check on the concurrent map first, with minimal locking.
 		Constructor<?>[] candidateConstructors = this.candidateConstructorsCache.get(beanClass);
 		if (candidateConstructors == null) {
@@ -403,6 +407,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 	@Override
 	public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) {
+		// Annotation.3.4.根据解析好的@Autowired赋值
 		InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass(), pvs);
 		try {
 			metadata.inject(bean, beanName, pvs);
@@ -476,6 +481,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 		Class<?> targetClass = clazz;
 
 		do {
+			// Annotation.3.3.1.解析属性上的@Autowired和@Value
 			final List<InjectionMetadata.InjectedElement> fieldElements = new ArrayList<>();
 			ReflectionUtils.doWithLocalFields(targetClass, field -> {
 				MergedAnnotation<?> ann = findAutowiredAnnotation(field);
@@ -491,6 +497,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 				}
 			});
 
+			// Annotation.3.3.2.解析方法上的@Autowired和@Value
 			final List<InjectionMetadata.InjectedElement> methodElements = new ArrayList<>();
 			ReflectionUtils.doWithLocalMethods(targetClass, method -> {
 				Method bridgedMethod = BridgeMethodResolver.findBridgedMethod(method);
@@ -694,6 +701,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 			}
 			if (value != null) {
 				ReflectionUtils.makeAccessible(field);
+				// Annotation.3.4.1.属性上@Autowired的通过反射直接赋值
 				field.set(bean, value);
 			}
 		}
@@ -779,6 +787,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 			if (arguments != null) {
 				try {
 					ReflectionUtils.makeAccessible(method);
+					// Annotation.3.4.2.方法上的@Autowired通过反射调用
 					method.invoke(bean, arguments);
 				}
 				catch (InvocationTargetException ex) {

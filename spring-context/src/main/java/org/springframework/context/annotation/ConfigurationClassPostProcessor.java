@@ -244,6 +244,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 		this.registriesPostProcessed.add(registryId);
 
+		// Annotation.2.应用BeanDefinitionRegistryPostProcessor.postProcessBeanDefinitionRegistry时，处理标有@Configuration的BeanDefinition（@Component也当@Configuration处理）
 		processConfigBeanDefinitions(registry);
 	}
 
@@ -277,6 +278,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		List<BeanDefinitionHolder> configCandidates = new ArrayList<>();
 		String[] candidateNames = registry.getBeanDefinitionNames();
 
+		// Annotation.2.1.找到所有标有@Configuration的BeanDefinition（componentClasses）并排序，支持@Order
 		for (String beanName : candidateNames) {
 			BeanDefinition beanDef = registry.getBeanDefinition(beanName);
 			if (beanDef.getAttribute(ConfigurationClassUtils.CONFIGURATION_CLASS_ATTRIBUTE) != null) {
@@ -324,10 +326,12 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 				this.metadataReaderFactory, this.problemReporter, this.environment,
 				this.resourceLoader, this.componentScanBeanNameGenerator, registry);
 
+		// Annotation.2.2.解析所有标有@Configuration的BeanDefinition所带的注解，生成BeanDefinition并注入
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 		do {
 			StartupStep processConfig = this.applicationStartup.start("spring.context.config-classes.parse");
+			// Annotation.2.2.1.解析所有标有@Configuration的BeanDefinition所带的注解
 			parser.parse(candidates);
 			parser.validate();
 
@@ -340,10 +344,12 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 						registry, this.sourceExtractor, this.resourceLoader, this.environment,
 						this.importBeanNameGenerator, parser.getImportRegistry());
 			}
+			// Annotation.2.2.2.将解析好的@Bean生成BeanDefinition并注入
 			this.reader.loadBeanDefinitions(configClasses);
 			alreadyParsed.addAll(configClasses);
 			processConfig.tag("classCount", () -> String.valueOf(configClasses.size())).end();
 
+			// Annotation.2.2.3.如果新注册的BeanDefinition仍然包含@Configuration，循环处理
 			candidates.clear();
 			if (registry.getBeanDefinitionCount() > candidateNames.length) {
 				String[] newCandidateNames = registry.getBeanDefinitionNames();
